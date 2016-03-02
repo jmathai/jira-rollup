@@ -42,6 +42,7 @@ exports.handler = function(event, context) {
       , slackResponse = new SlackResponse()
       , keyword = '';
   response.setContext(context);
+  response.setContentType('application/json');
 
   var jira = new JiraClient( {
     host: process.env.JIRA_HOST,
