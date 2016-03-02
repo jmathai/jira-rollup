@@ -4,6 +4,7 @@
   "description": "Boilerplate template for creating joules.",
   "main": "index.js",
   "dependencies": {
+    "jira-connector": "^2.0.0",
     "joule-node-response": "<2.0.0"
   },
   "devDependencies": {

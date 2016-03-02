@@ -1,14 +1,13 @@
 {
   "env": {
-    "MY_SECRET": "_some_secret_"
+    "JIRA_USERNAME": "username_here",
+    "JIRA_PASSWORD": "password_here",
+    "JIRA_HOST": "hostname_here"
   },
   "events": {
-    "GET": {
+    "POST": {
       "/user/joule": [
-        {"name":"name 1"}
-      ],
-      "/user/joule?name=name1": [
-        {}
+        {"text":"issue"}
       ]
     }
   }

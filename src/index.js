@@ -11,17 +11,68 @@
  *    event.{queryStringParam}, Query string parameters as defined in your .joule.yml
  */
 var Response = require('joule-node-response');
+var JiraClient = require('jira-connector');
+
+// {response_type: "in_channel", attachments: [{title: name, text: contactString, thumb_url: user['profile']['image_72'], fallback: "Required plain-text summary of the attachment."}]};
+var createTitle = function(issue) {
+  return issue.key + ' ' + issue.fields.summary + ' (assigned: ' + issue.fields.assignee.name + ')';
+};
+var createDescription = function(issue) {
+  var desc = issue.fields.description.substr(0, 100);
+  if(issue.fields.description.length > 100)
+    desc += '...';
+  return desc;
+};
+
+var SlackResponse = function() {
+  var response = {attachments: []};
+
+  this.addEntry = function(issue) {
+    response.attachments.push({title: createTitle(issue), description: createDescription(issue), title_link: issue.self});
+  };
+
+  this.getResponse = function() {
+    return response;
+  };
+};
 
 exports.handler = function(event, context) {
-	var response = new Response();
-	response.setContext(context);
+  console.log(event);
+  var response = new Response(),
+      slackResponse = new SlackResponse();
+  response.setContext(context);
 
-  var name = event.query['name'] || 'World';
-  var greeting = 'Hello, ' + name + '.';
+  var jira = new JiraClient( {
+    host: process.env.JIRA_HOST,
+    basic_auth: {
+      username: process.env.JIRA_USERNAME,
+      password: process.env.JIRA_PASSWORD
+    }
+  });
 
-  var result = {
-    "message": greeting
-  };
-  
-  response.send(result);
+  var command = 'search';
+  /*if(event.path.length > 0) {
+    command = event.path[0];
+  }*/
+
+  switch(command) {
+    case 'search':
+    default:
+      keyword = event.post['text'] || '';
+      jira.search.search({"jql": "text ~ '\""+keyword+"\"'", maxResults: 5}, function(err, results) {
+        console.log(err);
+        console.log(results);
+        if(err) {
+          response.setHttpStatusCode(500);
+          response.send({error: 'Error from call'});
+          return;
+        }
+
+        for(var r in results.issues) {
+          slackResponse.addEntry(results.issues[r]);
+        }
+        response.send(slackResponse.getResponse());
+      });
+      break;
+  }
 };
