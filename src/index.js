@@ -38,8 +38,9 @@ var SlackResponse = function() {
 
 exports.handler = function(event, context) {
   console.log(event);
-  var response = new Response(),
-      slackResponse = new SlackResponse();
+  var response = new Response()
+      , slackResponse = new SlackResponse()
+      , keyword = '';
   response.setContext(context);
 
   var jira = new JiraClient( {
@@ -58,7 +59,12 @@ exports.handler = function(event, context) {
   switch(command) {
     case 'search':
     default:
-      keyword = event.post['text'] || '';
+      if(event.query['text']) {
+        keyword = event.query['text'];
+      } else if(event.post['text']) {
+        keyword = event.post['text'];
+      }
+
       jira.search.search({"jql": "text ~ '\""+keyword+"\"'", maxResults: 5}, function(err, results) {
         console.log(err);
         console.log(results);
