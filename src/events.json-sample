@@ -1,0 +1,15 @@
+{
+  "env": {
+    "MY_SECRET": "_some_secret_"
+  },
+  "events": {
+    "GET": {
+      "/user/joule": [
+        {"name":"name 1"}
+      ],
+      "/user/joule?name=name1": [
+        {}
+      ]
+    }
+  }
+}
