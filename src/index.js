@@ -25,7 +25,7 @@ var createDescription = function(issue) {
 };
 
 var SlackResponse = function() {
-  var response = {attachments: []};
+  var response = {text: "Your search results.", attachments: []};
 
   this.addEntry = function(issue) {
     response.attachments.push({title: createTitle(issue), description: createDescription(issue), title_link: issue.self});
