@@ -70,7 +70,9 @@ exports.handler = function(event, context) {
       username = textParts[0];
       fixVersion = textParts[1];
 
-      jira.search.search({"jql": "project = PLEYBART AND fixVersion = "+fixVersion+" and assignee = "+username+"  and Status != Closed"}, function(err, results) {
+      var searchOpts = {"jql": "project = PLEYBART AND fixVersion = "+fixVersion+" and assignee = "+username+"  and Status != Closed"};
+      console.log(searchOpts);
+      jira.search.search(searchOpts, function(err, results) {
         console.log(err);
         console.log(results);
         if(err) {
