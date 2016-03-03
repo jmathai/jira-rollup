@@ -57,18 +57,20 @@ exports.handler = function(event, context) {
     command = event.path[0];
   }
 
-  console.log('command ' + command);
-
   switch(command) {
     case 'rollup':
       // project = PLEYBART AND fixVersion = Sprint-03-08-2016 and assignee = anuragp
       if(event.query['text']) {
-        username = event.query['text'];
+        text = event.query['text'];
       } else if(event.post['text']) {
-        username = event.post['text'];
+        text = event.post['text'];
       }
 
-      jira.search.search({"jql": "project = PLEYBART AND fixVersion = Sprint-03-08-2016 and assignee = "+username, maxResults: 5}, function(err, results) {
+      var textParts = text.split(' ');
+      username = textParts[0];
+      fixVersion = textParts[1];
+
+      jira.search.search({"jql": "project = PLEYBART AND fixVersion = "+fixVersion+" and assignee = "+username+"  and Status != Closed"}, function(err, results) {
         console.log(err);
         console.log(results);
         if(err) {
