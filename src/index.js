@@ -70,7 +70,7 @@ exports.handler = function(event, context) {
       username = textParts[0];
       fixVersion = textParts[1];
 
-      var searchOpts = {"jql": "project = PLEYBART AND fixVersion = "+fixVersion+" and assignee = "+username+"  and Status != Closed"};
+      var searchOpts = {"jql": "project = PLEYBART AND fixVersion = "+fixVersion+" and assignee = "+username+"  and Status != Closed", maxResults: 100};
       console.log(searchOpts);
       jira.search.search(searchOpts, function(err, results) {
         console.log(err);
@@ -86,7 +86,7 @@ exports.handler = function(event, context) {
         }
         response.send(slackResponse.getResponse());
       });
-      
+      break;
     case 'search':
     default:
       if(event.query['text']) {
