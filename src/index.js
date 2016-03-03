@@ -53,11 +53,36 @@ exports.handler = function(event, context) {
   });
 
   var command = 'search';
-  /*if(event.path.length > 0) {
+  if(event.path.length > 0) {
     command = event.path[0];
-  }*/
+  }
+
+  console.log('command ' + command);
 
   switch(command) {
+    case 'rollup':
+      // project = PLEYBART AND fixVersion = Sprint-03-08-2016 and assignee = anuragp
+      if(event.query['text']) {
+        username = event.query['text'];
+      } else if(event.post['text']) {
+        username = event.post['text'];
+      }
+
+      jira.search.search({"jql": "project = PLEYBART AND fixVersion = Sprint-03-08-2016 and assignee = "+username, maxResults: 5}, function(err, results) {
+        console.log(err);
+        console.log(results);
+        if(err) {
+          response.setHttpStatusCode(500);
+          response.send({error: 'Error from call'});
+          return;
+        }
+
+        for(var r in results.issues) {
+          slackResponse.addEntry(results.issues[r]);
+        }
+        response.send(slackResponse.getResponse());
+      });
+      
     case 'search':
     default:
       if(event.query['text']) {
